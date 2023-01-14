@@ -29,7 +29,7 @@
        (blank-p last-line)
        (blank-p line)))
 
-(defun output-line (line last-line config) 
+(defun cat (line last-line config) 
   "Output line according to config"
   (let ((number-all-lines (cat-config-number-all-lines config))
         (number-non-blank-lines (cat-config-number-non-blank-lines config))
@@ -37,7 +37,7 @@
         (show-ends (cat-config-show-ends config)))
 
     (when (skip-line-p line last-line squeeze-blanks) 
-      (return-from output-line))
+      (return-from cat))
 
     (when (number-line-p line number-all-lines number-non-blank-lines)
       (format t "    ~d  " *line-number*)
@@ -47,18 +47,17 @@
         (format t "~a$~%" line)
         (write-line line))))
 
-(defun cat (stream config)
-  "Read lines from stream printing according to config"
+(defun process-file (fn stream)
+  "Call fn on each line in given stream."
   (loop for line = (read-line stream nil) 
         and last-line = " " then line
         while line
-        do (output-line line last-line config)))
+        do (funcall fn line last-line)))
 
-(defun run (paths config)
-  (let ((paths (if (null paths) (list "-") paths)))
-    (setf *line-number* 1)
-    (dolist (path paths) 
-      (if (string= "-" path) 
-          (cat *standard-input* config)
-          (with-open-file (stream path)
-            (cat stream config))))))
+(defun run (fn paths &optional (*line-number* 1))
+  "Run fn on all of given paths."
+  (dolist (path paths) 
+    (if (string= "-" path) 
+        (process-file fn *standard-input*)
+        (with-open-file (stream path) 
+          (process-file fn stream)))))

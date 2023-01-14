@@ -64,10 +64,12 @@
                                     (gethash 'number options)))
              (show-ends (gethash 'show-ends options))
              (squeeze-blanks (gethash 'squeeze-blank options))
+             (paths (if (null paths) (list "-") paths))
              (config (make-cat-config :number-all-lines number-all-lines
                                       :number-non-blank-lines number-non-blank
                                       :show-ends show-ends
-                                      :squeeze-blanks squeeze-blanks)))
-        (exit-on-ctrl-c (run paths config))))
+                                      :squeeze-blanks squeeze-blanks))
+             (cat% (lambda (line last-line) (cat line last-line config))))
+        (exit-on-ctrl-c (run cat% paths))))
     (error (c) 
      (adopt:print-error-and-exit c))))
