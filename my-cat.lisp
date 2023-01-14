@@ -9,7 +9,6 @@
                       squeeze-blanks)
 
 (defparameter *line-number* 1)
-(defparameter *last-line* "   ") ;; the first line is always considered non-empty
 
 (defun blank-p (line) 
   "Is this line blank?"
@@ -24,23 +23,21 @@
   (or (and number-all-lines (not number-non-blank-lines))
       (and number-non-blank-lines (not (blank-p line)))))
 
-(defun skip-line-p (line squeeze-blanks) 
+(defun skip-line-p (line last-line squeeze-blanks) 
   "Should I skip printing this line?"
   (and squeeze-blanks
-       (blank-p *last-line*)
+       (blank-p last-line)
        (blank-p line)))
 
-(defun output-line (line config) 
+(defun output-line (line last-line config) 
   "Output line according to config"
   (let ((number-all-lines (cat-config-number-all-lines config))
         (number-non-blank-lines (cat-config-number-non-blank-lines config))
         (squeeze-blanks (cat-config-squeeze-blanks config))
         (show-ends (cat-config-show-ends config)))
 
-    (when (skip-line-p line squeeze-blanks) 
-      (setf *last-line* line)
+    (when (skip-line-p line last-line squeeze-blanks) 
       (return-from output-line))
-    (setf *last-line* line)
 
     (when (number-line-p line number-all-lines number-non-blank-lines)
       (format t "    ~d  " *line-number*)
@@ -53,8 +50,9 @@
 (defun cat (stream config)
   "Read lines from stream printing according to config"
   (loop for line = (read-line stream nil) 
+        and last-line = " " then line
         while line
-        do (output-line line config)))
+        do (output-line line last-line config)))
 
 (defun run (paths config)
   (let ((paths (if (null paths) (list "-") paths)))
