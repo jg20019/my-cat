@@ -51,9 +51,3 @@
           (cat *standard-input*)
           (with-open-file (stream path)
             (cat stream))))))
-
-(setf *last-line* " ")
-(setf *squeeze-blank* t)
-(with-open-file (stream "test")
-  (cat stream))
-
