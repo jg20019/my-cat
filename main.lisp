@@ -55,19 +55,19 @@
 
 (defun main ()
   (sb-ext:disable-debugger)
-  (handler-case 
+  (handler-case
     (multiple-value-bind (paths options) (adopt:parse-options *ui*) 
       (when (gethash 'help options) 
         (adopt:print-help-and-exit *ui*))
-      (when (gethash 'number options) 
-        (setf *number-all-output-lines* t))
-      (when (gethash 'number-non-blank options) 
-        (setf *number-all-output-lines* nil
-              *number-non-blank-lines* t))
-      (when (gethash 'show-ends options) 
-        (setf *show-ends* t))
-      (when (gethash 'squeeze-blank options) 
-        (setf *squeeze-blank* t))
-      (exit-on-ctrl-c (run paths))) 
-    (error (c)
-      (adopt:print-error-and-exit c))))
+      (let* ((number-non-blank (gethash 'number-non-blank options)) 
+             (number-all-lines (and (not number-non-blank)
+                                    (gethash 'number options)))
+             (show-ends (gethash 'show-ends options))
+             (squeeze-blanks (gethash 'squeeze-blank options))
+             (config (make-cat-config :number-all-lines number-all-lines
+                                      :number-non-blank-lines number-non-blank
+                                      :show-ends show-ends
+                                      :squeeze-blanks squeeze-blanks)))
+        (exit-on-ctrl-c (run paths config))))
+    (error (c) 
+     (adopt:print-error-and-exit c))))
