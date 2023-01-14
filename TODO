@@ -1,0 +1,21 @@
+
+-[x]  Cat echoes standard input to standard output
+-[x]  Cat echoes standard input to standard output when 
+      path is "-"
+-[x]  Cat echoes standard input to standard output when
+      path is not given
+-[x]  Cat writes given files to standard output 
+
+Implement Options
+-[x] -b, --number-non-blank Cat numbers non-empty lines
+-[x] -E, --show-ends
+         display $ at the end of each line
+-[x] -n, --number number all output lines
+-[x] -s, --squeeze-blank  
+     suppress repeated empty output lines 
+-[ ] -t equivalent to vT
+-[ ] -T --show-tabs display TAB characters as ^I
+-[ ] -u (ignored)
+-[ ] -v, --show-nopriting
+     use ^ and M- notation, except for LFD and TAB
+-[x] --help display this help and exit
